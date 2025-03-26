@@ -4,7 +4,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MindMap Visualizer</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/reactflow@11/dist/react-flow.min.js"></script>
+    <link href="https://unpkg.com/reactflow@11/dist/style.css" rel="stylesheet" />
+    <style>
+        .flow-container {
+            width: 100%;
+            height: 800px;
+        }
+        .mindmap-node {
+            padding: 10px;
+            border-radius: 5px;
+            background: white;
+            border: 1px solid #ccc;
+            width: auto;
+            text-align: center;
+        }
+        .mindmap-node.root {
+            background: #4a90e2;
+            color: white;
+        }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50">
@@ -77,70 +98,109 @@
             </div>
 
             <div class="md:col-span-3 bg-white rounded-lg shadow">
-                <div id="mindmap" class="w-full h-[calc(100vh-8rem)] flex items-center justify-center text-gray-500">
-                    <div class="text-center">
-                        <div class="flex justify-center mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-medium mb-2">No Mindmap Loaded</h3>
-                        <p class="text-sm text-gray-500">Upload a JSON file or paste JSON text from the sidebar to visualize<br>your mindmap structure.</p>
-                        <div class="mt-6 p-4 bg-gray-50 rounded-lg max-w-lg mx-auto">
-                            <h4 class="text-sm font-medium mb-2">Example JSON Format:</h4>
-                            <pre class="text-xs text-left overflow-auto p-2 bg-white rounded border">{
-  "id": "root",
-  "text": "Main Topic",
-  "children": [
-    {
-      "id": "1",
-      "text": "Subtopic 1",
-      "children": [
-        { "id": "1.1", "text": "Detail 1.1" },
-        { "id": "1.2", "text": "Detail 1.2" }
-      ]
-    },
-    {
-      "id": "2",
-      "text": "Subtopic 2",
-      "children": []
-    }
-  ]
-}</pre>
-                        </div>
-                    </div>
-                </div>
+                <div id="flow-container" class="flow-container"></div>
             </div>
         </div>
     </div>
 
     <script>
+        const { useCallback } = React;
+        const { ReactFlow, Background, Controls, useNodesState, useEdgesState } = ReactFlowRenderer;
+
+        function MindmapNode({ data }) {
+            return (
+                <div className={`mindmap-node ${data.root ? 'root' : ''}`}>
+                    {data.label}
+                </div>
+            );
+        }
+
+        function Flow() {
+            const nodeTypes = {
+                mindmap: MindmapNode
+            };
+
+            const transformData = (data) => {
+                const nodes = [];
+                const edges = [];
+                let id = 0;
+
+                function processNode(node, x, y, parentId = null) {
+                    const currentId = `node-${id++}`;
+                    nodes.push({
+                        id: currentId,
+                        type: 'mindmap',
+                        position: { x, y },
+                        data: { 
+                            label: node.text,
+                            root: parentId === null 
+                        }
+                    });
+
+                    if (parentId) {
+                        edges.push({
+                            id: `edge-${parentId}-${currentId}`,
+                            source: parentId,
+                            target: currentId,
+                            type: 'smoothstep'
+                        });
+                    }
+
+                    if (node.children) {
+                        const childSpacing = 200;
+                        node.children.forEach((child, index) => {
+                            const childY = y + 100;
+                            const childX = x + (index - (node.children.length - 1) / 2) * childSpacing;
+                            processNode(child, childX, childY, currentId);
+                        });
+                    }
+                }
+
+                processNode(data, window.innerWidth / 2, 100);
+                return { nodes, edges };
+            };
+
+            const defaultViewport = { x: 0, y: 0, zoom: 1 };
+
+            return React.createElement(ReactFlow, {
+                nodeTypes: nodeTypes,
+                defaultViewport: defaultViewport,
+                nodes: window.flowData.nodes,
+                edges: window.flowData.edges,
+                fitView: true
+            }, [
+                React.createElement(Background, { variant: 'dots', gap: 12, size: 1 }),
+                React.createElement(Controls)
+            ]);
+        }
+
+        // Sample JSON data
+        const sampleData = {
+            "id": "root",
+            "text": "Main Topic",
+            "children": [
+                {
+                    "id": "1",
+                    "text": "Subtopic 1",
+                    "children": [
+                        { "id": "1.1", "text": "Detail 1.1" },
+                        { "id": "1.2", "text": "Detail 1.2" }
+                    ]
+                },
+                {
+                    "id": "2",
+                    "text": "Subtopic 2",
+                    "children": []
+                }
+            ]
+        };
+
+
         document.addEventListener('DOMContentLoaded', () => {
             const dropZone = document.getElementById('dropZone');
             const jsonInput = document.getElementById('jsonInput');
             const visualizeBtn = document.getElementById('visualizeBtn');
             const loadSampleBtn = document.getElementById('loadSampleBtn');
-
-            // Sample JSON data
-            const sampleData = {
-                "id": "root",
-                "text": "Main Topic",
-                "children": [
-                    {
-                        "id": "1",
-                        "text": "Subtopic 1",
-                        "children": [
-                            { "id": "1.1", "text": "Detail 1.1" },
-                            { "id": "1.2", "text": "Detail 1.2" }
-                        ]
-                    },
-                    {
-                        "id": "2",
-                        "text": "Subtopic 2",
-                        "children": []
-                    }
-                ]
-            };
 
             loadSampleBtn.addEventListener('click', () => {
                 jsonInput.value = JSON.stringify(sampleData, null, 2);
@@ -171,140 +231,15 @@
             visualizeBtn.addEventListener('click', () => {
                 try {
                     const data = JSON.parse(jsonInput.value);
-                    visualize(data);
+                    window.flowData = transformData(data);
+                    ReactDOM.render(
+                        React.createElement(Flow),
+                        document.getElementById('flow-container')
+                    );
                 } catch (error) {
                     alert('Invalid JSON format');
                 }
             });
-
-            function visualize(data) {
-                const width = document.getElementById('mindmap').offsetWidth;
-                const height = document.getElementById('mindmap').offsetHeight;
-                const margin = { top: 20, right: 120, bottom: 20, left: 120 };
-
-                // Clear previous visualization
-                d3.select('#mindmap').html('');
-
-                const svg = d3.select('#mindmap')
-                    .append('svg')
-                    .attr('width', width)
-                    .attr('height', height)
-                    .style('background', 'white');
-
-                const g = svg.append('g')
-                    .attr('transform', `translate(${margin.left},${margin.top})`);
-
-                const tree = d3.tree()
-                    .size([height - margin.top - margin.bottom, width - margin.left - margin.right])
-                    .separation((a, b) => (a.parent == b.parent ? 1.2 : 2));
-
-                const root = d3.hierarchy(data);
-                tree(root);
-
-                // Add links with elbow connectors
-                const links = g.selectAll('.link')
-                    .data(root.links())
-                    .join('path')
-                    .attr('class', 'link')
-                    .attr('fill', 'none')
-                    .attr('stroke', '#666')
-                    .attr('stroke-width', 1)
-                    .attr('d', d => `
-                        M${d.source.y},${d.source.x}
-                        H${(d.source.y + d.target.y) / 2}
-                        V${d.target.x}
-                        H${d.target.y}
-                    `);
-
-                // Add nodes
-                const nodes = g.selectAll('.node')
-                    .data(root.descendants())
-                    .join('g')
-                    .attr('class', 'node')
-                    .attr('transform', d => `translate(${d.y},${d.x})`);
-
-                // Add text labels first to measure their size
-                const textNodes = nodes.append('text')
-                    .attr('dy', '0.35em')
-                    .attr('text-anchor', 'middle')
-                    .text(d => d.data.text)
-                    .attr('fill', d => d.depth === 0 ? '#fff' : '#000')
-                    .attr('font-size', d => d.depth === 0 ? '13px' : '11px')
-                    .attr('font-weight', d => d.depth === 0 ? 'bold' : 'normal')
-                    .style('font-family', 'Arial, sans-serif')
-                    .style('dominant-baseline', 'middle');
-
-                // Calculate text width for each node
-                const padding = 20; // Padding on each side
-                const textWidths = {};
-                textNodes.each(function(d) {
-                    textWidths[d.id] = this.getComputedTextLength() + (padding * 2);
-                });
-
-                // Add background rectangles sized to fit text
-                nodes.insert('rect', 'text')
-                    .attr('x', d => -(textWidths[d.id] / 2))
-                    .attr('y', -15)
-                    .attr('width', d => textWidths[d.id])
-                    .attr('height', 30)
-                    .attr('rx', 5)
-                    .attr('ry', 5)
-                    .attr('fill', d => d.depth === 0 ? '#1a237e' : '#fff')
-                    .attr('stroke', '#ccc')
-                    .attr('stroke-width', 1);
-
-                // Text labels are already added
-                    .attr('dy', '0.35em')
-                    .attr('text-anchor', 'middle')
-                    .text(d => d.data.text)
-                    .attr('fill', d => d.depth === 0 ? '#fff' : '#000')
-                    .attr('font-size', d => d.depth === 0 ? '13px' : '11px')
-                    .attr('font-weight', d => d.depth === 0 ? 'bold' : 'normal')
-                    .style('font-family', 'Arial, sans-serif')
-                    .style('dominant-baseline', 'middle')
-                    .call(wrap, 200);
-
-                function wrap(text, width) {
-                    text.each(function() {
-                        let text = d3.select(this);
-                        let words = text.text().split(/\s+/).reverse();
-                        let word;
-                        let line = [];
-                        let lineNumber = 0;
-                        let lineHeight = 1.1;
-                        let y = text.attr("y");
-                        let dy = parseFloat(text.attr("dy"));
-                        let tspan = text.text(null).append("tspan")
-                            .attr("x", 0)
-                            .attr("y", y)
-                            .attr("dy", dy + "em");
-                        
-                        while (word = words.pop()) {
-                            line.push(word);
-                            tspan.text(line.join(" "));
-                            if (tspan.node().getComputedTextLength() > width) {
-                                line.pop();
-                                tspan.text(line.join(" "));
-                                line = [word];
-                                tspan = text.append("tspan")
-                                    .attr("x", 0)
-                                    .attr("y", y)
-                                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
-                                    .text(word);
-                            }
-                        }
-                    });
-                }
-
-                // Add zoom behavior
-                const zoom = d3.zoom()
-                    .scaleExtent([0.5, 2])
-                    .on('zoom', (event) => {
-                        g.attr('transform', event.transform);
-                    });
-
-                svg.call(zoom);
-            }
         });
     </script>
 </body>
