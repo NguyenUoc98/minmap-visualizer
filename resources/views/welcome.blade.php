@@ -180,7 +180,7 @@
             function visualize(data) {
                 const width = document.getElementById('mindmap').offsetWidth;
                 const height = document.getElementById('mindmap').offsetHeight;
-                const margin = 100;
+                const margin = { top: 20, right: 120, bottom: 20, left: 120 };
 
                 // Clear previous visualization
                 d3.select('#mindmap').html('');
@@ -192,27 +192,29 @@
                     .style('background', 'white');
 
                 const g = svg.append('g')
-                    .attr('transform', `translate(${margin},${height/2})`);
+                    .attr('transform', `translate(${margin.left},${margin.top})`);
 
                 const tree = d3.tree()
-                    .size([height - 2 * margin, width - 2 * margin])
-                    .separation((a, b) => (a.parent == b.parent ? 1.5 : 2));
+                    .size([height - margin.top - margin.bottom, width - margin.left - margin.right])
+                    .separation((a, b) => (a.parent == b.parent ? 1.2 : 2));
 
                 const root = d3.hierarchy(data);
                 tree(root);
 
-                // Add links with smooth curves
+                // Add links with elbow connectors
                 const links = g.selectAll('.link')
                     .data(root.links())
                     .join('path')
                     .attr('class', 'link')
                     .attr('fill', 'none')
-                    .attr('stroke', '#2563eb')
-                    .attr('stroke-width', 1.5)
-                    .attr('stroke-opacity', 0.4)
-                    .attr('d', d3.linkHorizontal()
-                        .x(d => d.y)
-                        .y(d => d.x));
+                    .attr('stroke', '#666')
+                    .attr('stroke-width', 1)
+                    .attr('d', d => `
+                        M${d.source.y},${d.source.x}
+                        H${(d.source.y + d.target.y) / 2}
+                        V${d.target.x}
+                        H${d.target.y}
+                    `);
 
                 // Add nodes
                 const nodes = g.selectAll('.node')
@@ -221,22 +223,39 @@
                     .attr('class', 'node')
                     .attr('transform', d => `translate(${d.y},${d.x})`);
 
-                // Add node circles with different colors based on depth
-                nodes.append('circle')
-                    .attr('r', 6)
-                    .attr('fill', d => d.depth === 0 ? '#2563eb' : '#60a5fa')
-                    .attr('stroke', '#1d4ed8')
-                    .attr('stroke-width', 1.5);
+                // Add background rectangles for nodes
+                nodes.append('rect')
+                    .attr('x', -60)
+                    .attr('y', -15)
+                    .attr('width', d => d.depth === 0 ? 120 : 100)
+                    .attr('height', 30)
+                    .attr('rx', 5)
+                    .attr('ry', 5)
+                    .attr('fill', d => d.depth === 0 ? '#1a237e' : '#fff')
+                    .attr('stroke', '#ccc')
+                    .attr('stroke-width', 1);
 
-                // Add text labels with better positioning and styling
+                // Add text labels with centered positioning
                 nodes.append('text')
-                    .attr('dy', '0.31em')
-                    .attr('x', d => d.children ? -12 : 12)
-                    .attr('text-anchor', d => d.children ? 'end' : 'start')
+                    .attr('dy', '0.35em')
+                    .attr('text-anchor', 'middle')
                     .text(d => d.data.text)
-                    .attr('fill', '#1f2937')
-                    .attr('font-size', d => d.depth === 0 ? '14px' : '12px')
-                    .attr('font-weight', d => d.depth === 0 ? 'bold' : 'normal');
+                    .attr('fill', d => d.depth === 0 ? '#fff' : '#000')
+                    .attr('font-size', d => d.depth === 0 ? '13px' : '11px')
+                    .attr('font-weight', d => d.depth === 0 ? 'bold' : 'normal')
+                    .style('font-family', 'Arial, sans-serif')
+                    .each(function(d) {
+                        // Truncate text if too long
+                        const maxWidth = d.depth === 0 ? 110 : 90;
+                        let text = d3.select(this);
+                        let textLength = text.node().getComputedTextLength();
+                        let textContent = text.text();
+                        while (textLength > maxWidth && textContent.length > 0) {
+                            textContent = textContent.slice(0, -1);
+                            text.text(textContent + '...');
+                            textLength = text.node().getComputedTextLength();
+                        }
+                    });
 
                 // Add zoom behavior
                 const zoom = d3.zoom()
