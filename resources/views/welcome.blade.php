@@ -180,6 +180,7 @@
             function visualize(data) {
                 const width = document.getElementById('mindmap').offsetWidth;
                 const height = document.getElementById('mindmap').offsetHeight;
+                const margin = 100;
 
                 // Clear previous visualization
                 d3.select('#mindmap').html('');
@@ -187,49 +188,55 @@
                 const svg = d3.select('#mindmap')
                     .append('svg')
                     .attr('width', width)
-                    .attr('height', height);
+                    .attr('height', height)
+                    .style('background', 'white');
 
                 const g = svg.append('g')
-                    .attr('transform', `translate(${width/2},${height/2})`);
+                    .attr('transform', `translate(${margin},${height/2})`);
 
                 const tree = d3.tree()
-                    .size([360, Math.min(width, height)/3])
-                    .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
+                    .size([height - 2 * margin, width - 2 * margin])
+                    .separation((a, b) => (a.parent == b.parent ? 1.5 : 2));
 
                 const root = d3.hierarchy(data);
                 tree(root);
 
-                // Add links
-                g.selectAll('.link')
+                // Add links with smooth curves
+                const links = g.selectAll('.link')
                     .data(root.links())
                     .join('path')
                     .attr('class', 'link')
                     .attr('fill', 'none')
-                    .attr('stroke', '#ccc')
-                    .attr('d', d3.linkRadial()
-                        .angle(d => d.x / 180 * Math.PI)
-                        .radius(d => d.y));
+                    .attr('stroke', '#2563eb')
+                    .attr('stroke-width', 1.5)
+                    .attr('stroke-opacity', 0.4)
+                    .attr('d', d3.linkHorizontal()
+                        .x(d => d.y)
+                        .y(d => d.x));
 
                 // Add nodes
-                const node = g.selectAll('.node')
+                const nodes = g.selectAll('.node')
                     .data(root.descendants())
                     .join('g')
                     .attr('class', 'node')
-                    .attr('transform', d => `rotate(${d.x - 90}) translate(${d.y},0)`);
+                    .attr('transform', d => `translate(${d.y},${d.x})`);
 
-                // Add circles for nodes
-                node.append('circle')
-                    .attr('r', 4)
-                    .attr('fill', '#69b3a2');
+                // Add node circles with different colors based on depth
+                nodes.append('circle')
+                    .attr('r', 6)
+                    .attr('fill', d => d.depth === 0 ? '#2563eb' : '#60a5fa')
+                    .attr('stroke', '#1d4ed8')
+                    .attr('stroke-width', 1.5);
 
-                // Add text labels
-                node.append('text')
-                    .attr('dy', '.31em')
-                    .attr('x', d => d.x < 180 ? 6 : -6)
-                    .attr('text-anchor', d => d.x < 180 ? 'start' : 'end')
-                    .attr('transform', d => d.x < 180 ? null : 'rotate(180)')
+                // Add text labels with better positioning and styling
+                nodes.append('text')
+                    .attr('dy', '0.31em')
+                    .attr('x', d => d.children ? -12 : 12)
+                    .attr('text-anchor', d => d.children ? 'end' : 'start')
                     .text(d => d.data.text)
-                    .attr('fill', 'currentColor');
+                    .attr('fill', '#1f2937')
+                    .attr('font-size', d => d.depth === 0 ? '14px' : '12px')
+                    .attr('font-weight', d => d.depth === 0 ? 'bold' : 'normal');
 
                 // Add zoom behavior
                 const zoom = d3.zoom()
