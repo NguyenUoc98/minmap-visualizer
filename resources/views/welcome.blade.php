@@ -223,11 +223,29 @@
                     .attr('class', 'node')
                     .attr('transform', d => `translate(${d.y},${d.x})`);
 
-                // Add background rectangles for nodes
-                nodes.append('rect')
-                    .attr('x', -60)
+                // Add text labels first to measure their size
+                const textNodes = nodes.append('text')
+                    .attr('dy', '0.35em')
+                    .attr('text-anchor', 'middle')
+                    .text(d => d.data.text)
+                    .attr('fill', d => d.depth === 0 ? '#fff' : '#000')
+                    .attr('font-size', d => d.depth === 0 ? '13px' : '11px')
+                    .attr('font-weight', d => d.depth === 0 ? 'bold' : 'normal')
+                    .style('font-family', 'Arial, sans-serif')
+                    .style('dominant-baseline', 'middle');
+
+                // Calculate text width for each node
+                const padding = 20; // Padding on each side
+                const textWidths = {};
+                textNodes.each(function(d) {
+                    textWidths[d.id] = this.getComputedTextLength() + (padding * 2);
+                });
+
+                // Add background rectangles sized to fit text
+                nodes.insert('rect', 'text')
+                    .attr('x', d => -(textWidths[d.id] / 2))
                     .attr('y', -15)
-                    .attr('width', d => d.depth === 0 ? 120 : 100)
+                    .attr('width', d => textWidths[d.id])
                     .attr('height', 30)
                     .attr('rx', 5)
                     .attr('ry', 5)
@@ -235,8 +253,7 @@
                     .attr('stroke', '#ccc')
                     .attr('stroke-width', 1);
 
-                // Add text labels with centered positioning
-                nodes.append('text')
+                // Text labels are already added
                     .attr('dy', '0.35em')
                     .attr('text-anchor', 'middle')
                     .text(d => d.data.text)
