@@ -244,18 +244,40 @@
                     .attr('font-size', d => d.depth === 0 ? '13px' : '11px')
                     .attr('font-weight', d => d.depth === 0 ? 'bold' : 'normal')
                     .style('font-family', 'Arial, sans-serif')
-                    .each(function(d) {
-                        // Truncate text if too long
-                        const maxWidth = d.depth === 0 ? 110 : 90;
+                    .style('dominant-baseline', 'middle')
+                    .call(wrap, 200);
+
+                function wrap(text, width) {
+                    text.each(function() {
                         let text = d3.select(this);
-                        let textLength = text.node().getComputedTextLength();
-                        let textContent = text.text();
-                        while (textLength > maxWidth && textContent.length > 0) {
-                            textContent = textContent.slice(0, -1);
-                            text.text(textContent + '...');
-                            textLength = text.node().getComputedTextLength();
+                        let words = text.text().split(/\s+/).reverse();
+                        let word;
+                        let line = [];
+                        let lineNumber = 0;
+                        let lineHeight = 1.1;
+                        let y = text.attr("y");
+                        let dy = parseFloat(text.attr("dy"));
+                        let tspan = text.text(null).append("tspan")
+                            .attr("x", 0)
+                            .attr("y", y)
+                            .attr("dy", dy + "em");
+                        
+                        while (word = words.pop()) {
+                            line.push(word);
+                            tspan.text(line.join(" "));
+                            if (tspan.node().getComputedTextLength() > width) {
+                                line.pop();
+                                tspan.text(line.join(" "));
+                                line = [word];
+                                tspan = text.append("tspan")
+                                    .attr("x", 0)
+                                    .attr("y", y)
+                                    .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                                    .text(word);
+                            }
                         }
                     });
+                }
 
                 // Add zoom behavior
                 const zoom = d3.zoom()
