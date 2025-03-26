@@ -16,26 +16,6 @@ const nodeTypes = {
     mindmap: MindmapNode
 };
 
-// Sample JSON data structure
-const sampleData = {
-    "name": "Root Topic",
-    "children": [
-        {
-            "name": "Child 1",
-            "children": [
-                { "name": "Grandchild 1.1" },
-                { "name": "Grandchild 1.2" }
-            ]
-        },
-        {
-            "name": "Child 2",
-            "children": [
-                { "name": "Grandchild 2.1" }
-            ]
-        }
-    ]
-};
-
 function processJsonToNodes(json, parentX = 0, parentY = 0, level = 0) {
     const nodes = [];
     const edges = [];
@@ -45,7 +25,7 @@ function processJsonToNodes(json, parentX = 0, parentY = 0, level = 0) {
         id: currentId.toString(),
         type: 'mindmap',
         data: { 
-            label: json.name,
+            label: json.text || json.name,
             root: level === 0 
         },
         position: { x: parentX, y: parentY }
@@ -84,17 +64,52 @@ function processJsonToNodes(json, parentX = 0, parentY = 0, level = 0) {
 }
 
 function MindmapApp() {
-    const [nodes, edges] = processJsonToNodes(sampleData);
-    
+    const [jsonInput, setJsonInput] = useState('');
+    const [nodes, setNodes] = useState([]);
+    const [edges, setEdges] = useState([]);
+    const [error, setError] = useState('');
+
+    const handleVisualize = () => {
+        try {
+            const jsonData = JSON.parse(jsonInput);
+            const [processedNodes, processedEdges] = processJsonToNodes(jsonData);
+            setNodes(processedNodes);
+            setEdges(processedEdges);
+            setError('');
+        } catch (e) {
+            setError('Invalid JSON format');
+        }
+    };
+
     return (
-        <ReactFlow 
-            nodes={nodes}
-            edges={edges}
-            nodeTypes={nodeTypes}
-            fitView
-        >
-            <Controls />
-        </ReactFlow>
+        <div className="flex flex-col gap-4">
+            <div className="p-4">
+                <textarea 
+                    className="w-full p-2 border rounded"
+                    rows="6"
+                    value={jsonInput}
+                    onChange={(e) => setJsonInput(e.target.value)}
+                    placeholder='Enter JSON data here...'
+                />
+                {error && <div className="text-red-500 mt-2">{error}</div>}
+                <button 
+                    onClick={handleVisualize}
+                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    Visualize Mindmap
+                </button>
+            </div>
+            <div style={{ height: '500px' }}>
+                <ReactFlow 
+                    nodes={nodes}
+                    edges={edges}
+                    nodeTypes={nodeTypes}
+                    fitView
+                >
+                    <Controls />
+                </ReactFlow>
+            </div>
+        </div>
     );
 }
 
