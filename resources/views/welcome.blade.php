@@ -178,8 +178,67 @@
             });
 
             function visualize(data) {
-                // D3.js visualization code will go here
-                console.log('Visualizing:', data);
+                const width = document.getElementById('mindmap').offsetWidth;
+                const height = document.getElementById('mindmap').offsetHeight;
+
+                // Clear previous visualization
+                d3.select('#mindmap').html('');
+
+                const svg = d3.select('#mindmap')
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', height);
+
+                const g = svg.append('g')
+                    .attr('transform', `translate(${width/2},${height/2})`);
+
+                const tree = d3.tree()
+                    .size([360, Math.min(width, height)/3])
+                    .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
+
+                const root = d3.hierarchy(data);
+                tree(root);
+
+                // Add links
+                g.selectAll('.link')
+                    .data(root.links())
+                    .join('path')
+                    .attr('class', 'link')
+                    .attr('fill', 'none')
+                    .attr('stroke', '#ccc')
+                    .attr('d', d3.linkRadial()
+                        .angle(d => d.x / 180 * Math.PI)
+                        .radius(d => d.y));
+
+                // Add nodes
+                const node = g.selectAll('.node')
+                    .data(root.descendants())
+                    .join('g')
+                    .attr('class', 'node')
+                    .attr('transform', d => `rotate(${d.x - 90}) translate(${d.y},0)`);
+
+                // Add circles for nodes
+                node.append('circle')
+                    .attr('r', 4)
+                    .attr('fill', '#69b3a2');
+
+                // Add text labels
+                node.append('text')
+                    .attr('dy', '.31em')
+                    .attr('x', d => d.x < 180 ? 6 : -6)
+                    .attr('text-anchor', d => d.x < 180 ? 'start' : 'end')
+                    .attr('transform', d => d.x < 180 ? null : 'rotate(180)')
+                    .text(d => d.data.text)
+                    .attr('fill', 'currentColor');
+
+                // Add zoom behavior
+                const zoom = d3.zoom()
+                    .scaleExtent([0.5, 2])
+                    .on('zoom', (event) => {
+                        g.attr('transform', event.transform);
+                    });
+
+                svg.call(zoom);
             }
         });
     </script>
