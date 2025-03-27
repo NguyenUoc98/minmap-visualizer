@@ -55,12 +55,8 @@
                 </div>
 
                 <!-- Visualize Button -->
-                <button 
-                    class="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
-                    onclick="visualizeMindmap()"
-                >
-                    Visualize MindMap
-                </button>
+                <!-- Visualization is handled by React component -->
+                <div id="mindmap-controls"></div>
 
                 <!-- Sample JSON -->
                 <div class="mt-4">

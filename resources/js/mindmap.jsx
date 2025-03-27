@@ -113,7 +113,21 @@ function MindmapApp() {
     );
 }
 
+// Render main mindmap
 if (document.getElementById('mindmap')) {
     const root = ReactDOM.createRoot(document.getElementById('mindmap'));
     root.render(<MindmapApp />);
+}
+
+// Render controls
+if (document.getElementById('mindmap-controls')) {
+    const controlsRoot = ReactDOM.createRoot(document.getElementById('mindmap-controls'));
+    controlsRoot.render(
+        <button 
+            className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+            onClick={() => document.dispatchEvent(new Event('visualize-mindmap'))}
+        >
+            Visualize MindMap
+        </button>
+    );
 }
