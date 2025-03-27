@@ -119,15 +119,21 @@ if (document.getElementById('mindmap')) {
     root.render(<MindmapApp />);
 }
 
-// Render controls
-if (document.getElementById('mindmap-controls')) {
-    const controlsRoot = ReactDOM.createRoot(document.getElementById('mindmap-controls'));
-    controlsRoot.render(
-        <button 
-            className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
-            onClick={() => document.dispatchEvent(new Event('visualize-mindmap'))}
-        >
-            Visualize MindMap
-        </button>
-    );
-}
+React.useEffect(() => {
+        // Connect generate button with mindmap visualization
+        const generateBtn = document.getElementById('generateBtn');
+        if (generateBtn) {
+            generateBtn.addEventListener('click', handleVisualize);
+        }
+        
+        return () => {
+            if (generateBtn) {
+                generateBtn.removeEventListener('click', handleVisualize);
+            }
+        };
+    }, [handleVisualize]);
+
+    // Remove old controls render since we're using the button from welcome.blade.php
+    if (document.getElementById('mindmap-controls')) {
+        document.getElementById('mindmap-controls').remove();
+    }
