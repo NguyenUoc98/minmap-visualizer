@@ -6,7 +6,7 @@ import {
     getViewportForBounds,
 } from '@xyflow/react';
 import { toPng } from 'html-to-image';
-import JSZip from 'jszip';
+import { downloadXmind } from '@mind-elixir/export-xmind';
 
 function downloadImage(dataUrl) {
     const a = document.createElement('a');
@@ -15,47 +15,24 @@ function downloadImage(dataUrl) {
     a.click();
 }
 
-async function downloadXMind(nodes, edges) {
-    const zip = new JSZip();
-    
-    // Create content.json for xmind
+async function exportToXMind(nodes, edges) {
     const rootNode = nodes.find(node => node.data.root);
     
-    const createXmindNode = (node) => {
+    const createXmindData = (node) => {
         const childEdges = edges.filter(edge => edge.source === node.id);
         const children = childEdges.map(edge => {
             const childNode = nodes.find(n => n.id === edge.target);
-            return createXmindNode(childNode);
+            return createXmindData(childNode);
         });
         
         return {
-            title: node.data.label,
+            topic: node.data.label,
             children: children.length > 0 ? children : undefined
         };
     };
 
-    const content = {
-        rootTopic: createXmindNode(rootNode),
-        theme: {
-            properties: {}
-        }
-    };
-
-    // Add required xmind files
-    zip.file("content.json", JSON.stringify({ content: [content] }));
-    zip.file("metadata.json", JSON.stringify({
-        creator: "MindMap Visualizer",
-        version: "1.0"
-    }));
-
-    // Generate and download the zip file
-    const blob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'mindmap.xmind';
-    a.click();
-    URL.revokeObjectURL(url);
+    const data = createXmindData(rootNode);
+    downloadXmind(data);
 }
 
 function DownloadButton() {
@@ -99,7 +76,7 @@ function DownloadButton() {
                 </button>
                 <button 
                     className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors cursor-pointer"
-                    onClick={() => downloadXMind(getNodes(), getEdges())}
+                    onClick={() => exportToXMind(getNodes(), getEdges())}
                 >
                     Download XMind
                 </button>

@@ -6,6 +6,7 @@
         "dev": "vite"
     },
     "dependencies": {
+        "@mind-elixir/export-xmind": "^2.0.1",
         "@tailwindcss/vite": "^4.0.7",
         "@xyflow/react": "^12.4.4",
         "autoprefixer": "^10.4.20",
