@@ -44,7 +44,11 @@ const Flow = () => {
         if (!element) return;
         
         try {
-            const canvas = await html2canvas(element);
+            const canvas = await html2canvas(element, {
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                scale: 2
+            });
             const data = canvas.toDataURL('image/png');
             const link = document.createElement('a');
             link.href = data;

@@ -64,3 +64,14 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+/* Added to handle potential oklch colors in imported CSS - replace oklch with rgb equivalent */
+/* This is a placeholder and needs adaptation based on actual oklch values in your project */
+:root {
+  --fallback-color: rgb(255, 0, 0); /* Example fallback color. Change as needed */
+}
+
+[style*="oklch("] {
+  /* This selector finds elements with style attributes containing "oklch(" */
+  color: var(--fallback-color); /* Replace oklch with fallback color */
+}
