@@ -52,6 +52,12 @@ const Flow = () => {
             onEdgesChange={onEdgesChange}
             nodeTypes={nodeTypes}
             fitView
+            defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+            minZoom={0.1}
+            maxZoom={2}
+            nodesDraggable={false}
+            nodesConnectable={false}
+            elementsSelectable={false}
         >
             <Background />
             <Controls />
