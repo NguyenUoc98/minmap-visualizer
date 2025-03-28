@@ -10,7 +10,7 @@ import {
     Position,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 
 const MindMapNode = ({ data }) => {
     return (
@@ -39,24 +39,24 @@ const Flow = () => {
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-    const handleDownload = async () => {
+    const handleDownload = () => {
         const element = document.querySelector('.react-flow');
         if (!element) return;
         
-        try {
-            const canvas = await html2canvas(element, {
-                backgroundColor: '#ffffff',
-                useCORS: true,
-                scale: 2
-            });
-            const data = canvas.toDataURL('image/png');
+        toPng(element, {
+            backgroundColor: '#ffffff',
+            quality: 1.0,
+            pixelRatio: 2
+        })
+        .then((dataUrl) => {
             const link = document.createElement('a');
-            link.href = data;
+            link.href = dataUrl;
             link.download = 'mindmap.png';
             link.click();
-        } catch (error) {
+        })
+        .catch((error) => {
             console.error('Error downloading mindmap:', error);
-        }
+        });
     };
 
     useEffect(() => {
