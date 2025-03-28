@@ -107,41 +107,52 @@ const Flow = () => {
         >
             <Background />
             <Controls position={"bottom-center"} orientation={"horizontal"}>
-                <ControlButton onClick={() => {
-                    const { getNodes, getEdges } = useReactFlow();
-                    exportToXMind(getNodes(), getEdges());
-                }}>
-                    XMind
-                </ControlButton>
-                <ControlButton onClick={() => {
-                    const nodesBounds = getNodesBounds(getNodes());
-                    const mindMapWidth = nodesBounds.x + nodesBounds.width;
-                    const mindMapHeight = nodesBounds.y + nodesBounds.height;
-                    
-                    const viewport = getViewportForBounds(
-                        nodesBounds,
-                        mindMapWidth,
-                        mindMapHeight,
-                        0.5,
-                        2,
-                        0
-                    );
+                <div className="relative group">
+                    <ControlButton>
+                        Export ▼
+                    </ControlButton>
+                    <div className="hidden group-hover:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white rounded shadow-lg">
+                        <button 
+                            className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                            onClick={() => {
+                                const { getNodes, getEdges } = useReactFlow();
+                                exportToXMind(getNodes(), getEdges());
+                            }}>
+                            XMind
+                        </button>
+                        <button 
+                            className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                            onClick={() => {
+                                const nodesBounds = getNodesBounds(getNodes());
+                                const mindMapWidth = nodesBounds.x + nodesBounds.width;
+                                const mindMapHeight = nodesBounds.y + nodesBounds.height;
+                                
+                                const viewport = getViewportForBounds(
+                                    nodesBounds,
+                                    mindMapWidth,
+                                    mindMapHeight,
+                                    0.5,
+                                    2,
+                                    0
+                                );
 
-                    toPng(document.querySelector('.react-flow__viewport'), {
-                        backgroundColor: '#fff',
-                        width: mindMapWidth,
-                        height: mindMapHeight,
-                        quality: 1.0,
-                        pixelRatio: 2,
-                        style: {
-                            width: mindMapWidth,
-                            height: mindMapHeight,
-                            transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
-                        },
-                    }).then(downloadImage);
-                }}>
-                    PNG
-                </ControlButton>
+                                toPng(document.querySelector('.react-flow__viewport'), {
+                                    backgroundColor: '#fff',
+                                    width: mindMapWidth,
+                                    height: mindMapHeight,
+                                    quality: 1.0,
+                                    pixelRatio: 2,
+                                    style: {
+                                        width: mindMapWidth,
+                                        height: mindMapHeight,
+                                        transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+                                    },
+                                }).then(downloadImage);
+                            }}>
+                            PNG
+                        </button>
+                    </div>
+                </div>
             </Controls>
             <DownloadButton />
         </ReactFlow>
