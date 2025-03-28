@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
 import {
     ReactFlow,
     Background,
@@ -8,20 +8,16 @@ import {
     useEdgesState,
     Handle,
     Position,
-} from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
-import DownloadButton from './DownloadButton';
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import DownloadButton from "./DownloadButton";
 
 const MindMapNode = ({ data }) => {
     return (
-        <div className={`mindmap-node ${data.root ? 'root' : ''}`}>
+        <div className={`mindmap-node ${data.root ? "root" : ""}`}>
             {data.label}
 
-            <Handle
-                type="target"
-                position={Position.Left}
-                className="handle"
-            />
+            <Handle type="target" position={Position.Left} className="handle" />
             <Handle
                 type="source"
                 position={Position.Right}
@@ -32,7 +28,7 @@ const MindMapNode = ({ data }) => {
 };
 
 const nodeTypes = {
-    mindMap: MindMapNode
+    mindMap: MindMapNode,
 };
 
 const Flow = () => {
@@ -54,7 +50,6 @@ const Flow = () => {
             fitView
             defaultViewport={{ x: 0, y: 0, zoom: 1 }}
             minZoom={0.1}
-            maxZoom={2}
             nodesDraggable={false}
             nodesConnectable={false}
             elementsSelectable={false}
@@ -67,6 +62,6 @@ const Flow = () => {
 };
 
 // Render
-if (document.getElementById('react-flow-container')) {
-    ReactDOM.render(<Flow/>, document.getElementById('react-flow-container'));
+if (document.getElementById("react-flow-container")) {
+    ReactDOM.render(<Flow />, document.getElementById("react-flow-container"));
 }
