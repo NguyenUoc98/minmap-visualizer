@@ -24,47 +24,37 @@ async function exportToXMind(nodes, edges) {
     console.log('Root node:', rootNode);
     
     const createXmindData = (node) => {
-        console.log('Processing node:', node);
         const childEdges = edges.filter(edge => edge.source === node.id);
-        console.log('Child edges:', childEdges);
-        
         const children = childEdges.map(edge => {
             const childNode = nodes.find(n => n.id === edge.target);
             return createXmindData(childNode);
         });
         
-        const nodeData = {
-            title: node.data.label,
-            children: children.length > 0 ? children : undefined
+        return {
+            topic: node.data.label,
+            children: children.length > 0 ? children : undefined,
+            direction: 'right'
         };
-        console.log('Created node data:', nodeData);
-        return nodeData;
     };
 
     const mindmapData = {
-        root: createXmindData(rootNode)
+        template: "default",
+        theme: "fresh-blue",
+        version: "1.0",
+        title: rootNode.data.label,
+        rootTopic: createXmindData(rootNode)
     };
     
-    console.log('Final mindmap data:', mindmapData);
-    
     try {
-        console.log('Calling exportXmind...');
-        const result = await exportXmind(mindmapData);
-        console.log('Export result:', result);
-        
-        if (result instanceof Blob) {
-            const url = URL.createObjectURL(result);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'mindmap.xmind';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            console.log('Download initiated');
-        } else {
-            console.error('Export did not return a Blob:', result);
-        }
+        const blob = await exportXmind(mindmapData, "mindmap");
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'mindmap.xmind');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
     } catch (error) {
         console.error('Error in XMind export:', error);
     }
