@@ -16,12 +16,7 @@ function downloadImage(dataUrl) {
 }
 
 async function exportToXMind(nodes, edges) {
-    console.log('Starting XMind export...');
-    console.log('Nodes:', nodes);
-    console.log('Edges:', edges);
-    
     const rootNode = nodes.find(node => node.data.root);
-    console.log('Root node:', rootNode);
     
     const createXmindData = (node) => {
         const childEdges = edges.filter(edge => edge.source === node.id);
@@ -31,26 +26,27 @@ async function exportToXMind(nodes, edges) {
         });
         
         return {
-            topic: node.data.label,
-            children: children.length > 0 ? children : undefined,
-            direction: 'right'
+            title: node.data.label,
+            children: children.length > 0 ? children : undefined
         };
     };
 
     const mindmapData = {
-        template: "default",
-        theme: "fresh-blue",
-        version: "1.0",
         title: rootNode.data.label,
-        rootTopic: createXmindData(rootNode)
+        root: createXmindData(rootNode)
     };
-    
+
     try {
-        const blob = await exportXmind(mindmapData, "mindmap");
+        const xmindResult = await exportXmind(mindmapData);
+        if (!xmindResult) {
+            throw new Error('Export failed - no data returned');
+        }
+        
+        const blob = new Blob([xmindResult], { type: 'application/x-xmind' });
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'mindmap.xmind');
+        link.download = 'mindmap.xmind';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
