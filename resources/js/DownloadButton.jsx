@@ -6,7 +6,7 @@ import {
     getViewportForBounds,
 } from '@xyflow/react';
 import { toPng } from 'html-to-image';
-import exportXmind from '@mind-elixir/export-xmind';
+import { data2Xmind } from '@mind-elixir/export-xmind';
 
 function downloadImage(dataUrl) {
     const a = document.createElement('a');
@@ -37,12 +37,7 @@ async function exportToXMind(nodes, edges) {
     };
 
     try {
-        const xmindResult = await exportXmind(mindmapData);
-        if (!xmindResult) {
-            throw new Error('Export failed - no data returned');
-        }
-        
-        const blob = new Blob([xmindResult], { type: 'application/x-xmind' });
+        const blob = await data2Xmind(JSON.parse(JSON.stringify(mindmapData)));
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
