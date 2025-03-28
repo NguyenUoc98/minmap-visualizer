@@ -6,7 +6,7 @@ import {
     getViewportForBounds,
 } from '@xyflow/react';
 import { toPng } from 'html-to-image';
-import { downloadXmind } from '@mind-elixir/export-xmind';
+import exportXmind from '@mind-elixir/export-xmind';
 
 function downloadImage(dataUrl) {
     const a = document.createElement('a');
@@ -32,7 +32,7 @@ async function exportToXMind(nodes, edges) {
     };
 
     const data = createXmindData(rootNode);
-    downloadXmind(data);
+    exportXmind(data);
 }
 
 function DownloadButton() {
