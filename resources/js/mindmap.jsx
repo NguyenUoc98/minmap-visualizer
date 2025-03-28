@@ -4,6 +4,7 @@ import {
     ReactFlow,
     Background,
     Controls,
+    ControlButton,
     useNodesState,
     useEdgesState,
     Handle,
@@ -55,7 +56,11 @@ const Flow = () => {
             elementsSelectable={false}
         >
             <Background />
-            <Controls />
+            <Controls position={"bottom-center"} orientation={"horizontal"}>
+                <ControlButton class="px-4" onClick={() => alert('Something magical just happened. ✨')}>
+                    Download
+                </ControlButton>
+            </Controls>
             <DownloadButton />
         </ReactFlow>
     );
