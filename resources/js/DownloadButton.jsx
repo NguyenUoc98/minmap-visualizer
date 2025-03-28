@@ -26,15 +26,16 @@ async function exportToXMind(nodes, edges) {
         });
         
         return {
-            topic: {
-                title: node.data.label,
-                topics: children.length > 0 ? children : undefined
-            }
+            topic: node.data.label,
+            children: children.length > 0 ? children : undefined
         };
     };
 
     const mindmapData = {
-        root: createXmindData(rootNode)
+        nodeData: {
+            topic: rootNode.data.label,
+            children: createXmindData(rootNode).children
+        }
     };
 
     try {
