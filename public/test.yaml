@@ -1,0 +1,146 @@
+id: root
+text: Tăng Cường Quản Lý Nhà Nước Về Dân Tộc Tại Phường 17
+children:
+  - id: '1'
+    text: Giới thiệu
+    children:
+      - id: '1.1'
+        text: 'Tác giả: Lê Phạm Ngọc Đức'
+      - id: '1.2'
+        text: 'Ngành: Quản lý công'
+      - id: '1.3'
+        text: 'Đề án: Tăng cường quản lý nhà nước về dân tộc'
+  - id: '2'
+    text: Lý do xây dựng đề án
+    children:
+      - id: '2.1'
+        text: Vấn đề dân tộc quan trọng trong phát triển kinh tế - xã hội
+      - id: '2.2'
+        text: Đảng ta xác định chính sách dân tộc là chiến lược cơ bản
+      - id: '2.3'
+        text: Phường 17 có đông đồng bào dân tộc thiểu số
+  - id: '3'
+    text: Mục tiêu và Nhiệm vụ
+    children:
+      - id: '3.1'
+        text: Mục tiêu
+        children:
+          - id: 3.1.1
+            text: Phân tích, đánh giá thực trạng quản lý nhà nước về dân tộc
+          - id: 3.1.2
+            text: Đề xuất giải pháp tăng cường quản lý
+      - id: '3.2'
+        text: Nhiệm vụ
+        children:
+          - id: 3.2.1
+            text: Làm rõ cơ sở lý luận và thực tiễn của quản lý nhà nước về dân tộc
+          - id: 3.2.2
+            text: Phân tích thực trạng, thành công, hạn chế và nguyên nhân
+  - id: '4'
+    text: Phương pháp nghiên cứu
+    children:
+      - id: '4.1'
+        text: 'Phương pháp luận: Duy vật biện chứng và duy vật lịch sử'
+      - id: '4.2'
+        text: Phương pháp cụ thể
+        children:
+          - id: 4.2.1
+            text: Nghiên cứu tài liệu thứ cấp
+          - id: 4.2.2
+            text: Phân tích thực trạng
+          - id: 4.2.3
+            text: Tổng hợp và rút ra kết luận
+  - id: '5'
+    text: Nội dung chính
+    children:
+      - id: '5.1'
+        text: 'Chương 1: Cơ sở lý luận'
+        children:
+          - id: 5.1.1
+            text: 1.1. Một số khái niệm
+            children:
+              - id: 5.1.1.1
+                text: Dân tộc
+              - id: 5.1.1.2
+                text: Quản lý nhà nước về dân tộc
+          - id: 5.1.2
+            text: 1.2. Vai trò của quản lý nhà nước về dân tộc
+            children:
+              - id: 5.1.2.1
+                text: Ban hành và thực hiện chính sách dân tộc
+              - id: 5.1.2.2
+                text: Hợp tác quốc tế và kiểm tra, đánh giá thực hiện chính sách
+          - id: 5.1.3
+            text: 1.3. Đặc trưng về đời sống, kinh tế, văn hóa, xã hội của dân tộc
+            children:
+              - id: 5.1.3.1
+                text: Đời sống vật chất và tinh thần
+              - id: 5.1.3.2
+                text: Các vấn đề về giáo dục, y tế, văn hóa
+          - id: 5.1.4
+            text: 1.4. Yếu tố tác động đến quản lý nhà nước về dân tộc
+            children:
+              - id: 5.1.4.1
+                text: Yếu tố khách quan
+              - id: 5.1.4.2
+                text: Yếu tố chủ quan
+      - id: '5.2'
+        text: 'Chương 2: Thực trạng quản lý nhà nước về dân tộc'
+        children:
+          - id: 5.2.1
+            text: >-
+              2.1. Khái quát các vấn đề liên quan đến quản lý nhà nước về dân
+              tộc
+            content: Đặc điểm địa lý, kinh tế, văn hóa xã hội của Phường 17
+          - id: 5.2.2
+            text: 2.2. Nội dung quản lý nhà nước về dân tộc
+            children:
+              - id: 5.2.2.1
+                text: Công tác triển khai chính sách dân tộc
+              - id: 5.2.2.2
+                text: Kết quả thực hiện các chính sách
+          - id: 5.2.3
+            text: 2.3. Đánh giá chung về công tác quản lý nhà nước về dân tộc
+            children:
+              - id: 5.2.3.1
+                text: Ưu điểm
+              - id: 5.2.3.2
+                text: Hạn chế và nguyên nhân
+      - id: '5.3'
+        text: 'Chương 3: Giải pháp tăng cường quản lý nhà nước về dân tộc'
+        children:
+          - id: 5.3.1
+            text: 3.1. Định hướng thực hiện
+            children:
+              - id: 5.3.1.1
+                text: Tăng cường tuyên truyền, quán triệt chính sách
+              - id: 5.3.1.2
+                text: Nâng cao hiệu lực, hiệu quả quản lý nhà nước
+          - id: 5.3.2
+            text: 3.2. Giải pháp cụ thể
+            children:
+              - id: 5.3.2.1
+                text: Đổi mới phương thức thực hiện công tác dân tộc
+              - id: 5.3.2.2
+                text: Đào tạo, bồi dưỡng đội ngũ cán bộ
+              - id: 5.3.2.3
+                text: Thực hiện tốt công tác thanh tra, kiểm tra
+              - id: 5.3.2.4
+                text: Đẩy mạnh tuyên truyền, phổ biến, giáo dục pháp luật
+              - id: 5.3.2.5
+                text: Ứng dụng công nghệ thông tin
+  - id: '6'
+    text: Kết luận
+    children:
+      - id: '6.1'
+        text: >-
+          Quản lý nhà nước về dân tộc là một bộ phận cấu thành của hệ thống quản
+          lý nhà nước
+      - id: '6.2'
+        text: Cần có sự chung tay của cả hệ thống chính trị
+      - id: '6.3'
+        text: Giải pháp cần thiết để hoàn thiện quản lý nhà nước về công tác dân tộc
+  - id: '7'
+    text: Tài liệu tham khảo
+    content: >-
+      Danh mục tài liệu tham khảo liên quan đến công tác dân tộc và quản lý nhà nước

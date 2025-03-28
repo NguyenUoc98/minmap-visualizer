@@ -1,37 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import {
     ReactFlow,
     Background,
     Controls,
+    MiniMap,
     useNodesState,
     useEdgesState,
-    Handle,
     Position,
 } from '@xyflow/react';
+
 import '@xyflow/react/dist/style.css';
-
-const MindMapNode = ({ data }) => {
-    return (
-        <div className={`mindmap-node ${data.root ? 'root' : ''}`}>
-            {data.label}
-
-            <Handle
-                type="target"
-                position={Position.Left}
-                className="handle"
-            />
-            <Handle
-                type="source"
-                position={Position.Right}
-                className="handle"
-            />
-        </div>
-    );
-};
+import CustomNode from './CustomNode';
 
 const nodeTypes = {
-    mindMap: MindMapNode
+    custom: CustomNode,
+};
+
+const nodeDefaults = {
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
 };
 
 const Flow = () => {
@@ -54,11 +42,11 @@ const Flow = () => {
         >
             <Background />
             <Controls />
+            <MiniMap />
         </ReactFlow>
     );
 };
 
-// Render
 if (document.getElementById('react-flow-container')) {
     ReactDOM.render(<Flow/>, document.getElementById('react-flow-container'));
 }
