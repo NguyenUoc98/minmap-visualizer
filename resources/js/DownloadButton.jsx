@@ -16,38 +16,57 @@ function downloadImage(dataUrl) {
 }
 
 async function exportToXMind(nodes, edges) {
+    console.log('Starting XMind export...');
+    console.log('Nodes:', nodes);
+    console.log('Edges:', edges);
+    
     const rootNode = nodes.find(node => node.data.root);
+    console.log('Root node:', rootNode);
     
     const createXmindData = (node) => {
+        console.log('Processing node:', node);
         const childEdges = edges.filter(edge => edge.source === node.id);
+        console.log('Child edges:', childEdges);
+        
         const children = childEdges.map(edge => {
             const childNode = nodes.find(n => n.id === edge.target);
             return createXmindData(childNode);
         });
         
-        return {
+        const nodeData = {
             title: node.data.label,
-            topics: children.length > 0 ? children : undefined
+            children: children.length > 0 ? children : undefined
         };
+        console.log('Created node data:', nodeData);
+        return nodeData;
     };
 
-    const data = {
-        rootTopic: createXmindData(rootNode)
+    const mindmapData = {
+        root: createXmindData(rootNode)
     };
-
-    console.log('Exporting XMind data:', data);
+    
+    console.log('Final mindmap data:', mindmapData);
+    
     try {
-        const blob = await exportXmind(data);
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'mindmap.xmind';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        console.log('Calling exportXmind...');
+        const result = await exportXmind(mindmapData);
+        console.log('Export result:', result);
+        
+        if (result instanceof Blob) {
+            const url = URL.createObjectURL(result);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'mindmap.xmind';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            console.log('Download initiated');
+        } else {
+            console.error('Export did not return a Blob:', result);
+        }
     } catch (error) {
-        console.error('Error exporting XMind:', error);
+        console.error('Error in XMind export:', error);
     }
 }
 
