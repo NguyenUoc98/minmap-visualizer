@@ -26,13 +26,29 @@ async function exportToXMind(nodes, edges) {
         });
         
         return {
-            topic: node.data.label,
-            children: children.length > 0 ? children : undefined
+            title: node.data.label,
+            topics: children.length > 0 ? children : undefined
         };
     };
 
-    const data = createXmindData(rootNode);
-    exportXmind(data);
+    const data = {
+        rootTopic: createXmindData(rootNode)
+    };
+
+    console.log('Exporting XMind data:', data);
+    try {
+        const blob = await exportXmind(data);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mindmap.xmind';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error exporting XMind:', error);
+    }
 }
 
 function DownloadButton() {
